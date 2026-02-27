@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  S3 file checker - tags small files, deletes large ones (>10 MB).
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 128
+
+Resources:
+
+  # The S3 bucket that triggers our Lambda on every upload
+  UploadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Lifecycle rule: S3 will hard-delete any object after 7 days
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteAfter7Days
+            Status: Enabled
+            ExpirationInDays: 7
+
+  # The Lambda function
+  FileCheckerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler.lambda_handler
+      Description: Tags small uploads; deletes uploads larger than 10 MB.
+      # Give the function just enough permissions - nothing more
+      Policies:
+        - Statement:
+            - Sid: AllowHeadAndTag
+              Effect: Allow
+              Action:
+                - s3:GetObject          # needed for HeadObject via boto3
+                - s3:GetObjectTagging
+                - s3:PutObjectTagging
+              Resource: !Sub "arn:aws:s3:::${UploadBucket}/*"
+            - Sid: AllowDelete
+              Effect: Allow
+              Action:
+                - s3:DeleteObject
+              Resource: !Sub "arn:aws:s3:::${UploadBucket}/*"
+      # Wire up the S3 trigger
+      Events:
+        S3Upload:
+          Type: S3
+          Properties:
+            Bucket: !Ref UploadBucket
+            Events: s3:ObjectCreated:*
+
+Outputs:
+  BucketName:
+    Description: Upload files to this bucket to trigger the function
+    Value: !Ref UploadBucket
+  FunctionName:
+    Description: Lambda function name
+    Value: !Ref FileCheckerFunction
+
