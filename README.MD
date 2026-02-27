@@ -25,6 +25,6 @@ This project was developed with assistance from Amazon Q, AWS's AI-powered assis
 - AWS Cloudformation, used automatically when $sam build
 - Amazon CloudWatch, for monitoring and logging AWS Lambda
 - AWS IAM, for ID and access purposes.
-- AWS CLI
-- Python3, for the Lambda function code
-- Boto3, for AWS interaction
+- AWS CLI.
+- Python3, for the Lambda function code.
+- Boto3, for AWS interaction.
