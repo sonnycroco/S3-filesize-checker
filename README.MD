@@ -23,7 +23,7 @@ This project was developed with assistance from Amazon Q, AWS's AI-powered assis
 - AWS Lambda, serverless compute service to handle S3.
 - Amazon S3, for storage.
 - AWS Cloudformation, used automatically when $sam build.
-- Amazon CloudWatch, for monitoring and logging AWS Lambda
+- Amazon CloudWatch, for monitoring and logging AWS Lambda.
 - AWS IAM, for ID and access purposes.
 - AWS CLI.
 - Python3, for the Lambda function code.
